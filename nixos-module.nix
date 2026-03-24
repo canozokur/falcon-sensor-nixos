@@ -25,6 +25,11 @@ in {
         default = null;
         description = "Path to the Crowdstrike .deb file";
       };
+      version = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Crowdstrike version";
+      };
     };
   };
 

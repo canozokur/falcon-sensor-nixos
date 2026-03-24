@@ -7,30 +7,13 @@
   openssl,
   libnl,
   src ? throw "You must provide the CrowdStrike .deb file path",
+  version ? "unknown",
   ...
 }:
-
-let
-  # Run a command and capture its output as a string (by writing output to the nix store and reading it back)
-  runCommandString = command:
-    let
-      outputDerivation = stdenv.mkDerivation {
-        name = "run-command-string";
-        buildCommand = ''
-          { ${command} } > "$out"
-        '';
-      };
-    in
-    builtins.readFile outputDerivation;
-in
-
-stdenv.mkDerivation rec {
+stdenv.mkDerivation {
   pname = "falcon-sensor-unwrapped";
-  version = runCommandString ''
-    ${dpkg}/bin/dpkg-deb -f ${src} version | tr -d "\n"
-  '';
   arch = "x86_64-linux";
-  inherit src;
+  inherit src version;
 
   nativeBuildInputs = [
     autoPatchelfHook
