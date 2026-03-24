@@ -24,8 +24,12 @@ in {
         description = "falcon-sensor has a whitelist of supported kernels. This option sets the linux kernel.";
       };
       cid = mkOption {
-        type = types.either types.str types.path;
+        type = types.str;
         description = "Customer ID (CID) for your Crowdstrike Falcon Sensor.";
+      };
+      cidFile = mkOption {
+        type = types.either types.str types.path;
+        description = "Path to a file containing the CrowdStrike CID.";
       };
       debFile = mkOption {
         type = types.nullOr types.path;
@@ -52,6 +56,17 @@ in {
           customFalcon
         ];
 
+        assertions = [
+          {
+            assertion = (cfg.cid != null) || (cfg.cidFile != null);
+            message = "You must provide either services.falcon-sensor.cid or services.falcon-sensor.cidFile.";
+          }
+          {
+            assertion = (cfg.cid == null) || (cfg.cidFile == null);
+            message = "You cannot set both services.falcon-sensor.cid and services.falcon-sensor.cidFile at the same time.";
+          }
+        ];
+
         systemd = {
           tmpfiles.settings = {
             "10-falcon-sensor" = {
@@ -74,17 +89,7 @@ in {
             before = ["sysinit.target" "shutdown.target"];
             serviceConfig = {
               StandardOutput = "journal";
-              ExecStartPre =
-              let
-                # allow passing paths so we can pass secrets
-                cidString = if builtins.isPath cfg.cid then
-                  "$(cat ${cfg.cid})"
-                else if builtins.isString cfg.cid then
-                  cfg.cid
-                else
-                  "";
-              in
-              [
+              ExecStartPre = [
                 (pkgs.writeScript "falcon-init"
                   /*
                   bash
@@ -92,10 +97,17 @@ in {
                   ''
                     #!${pkgs.bash}/bin/bash
                     set -euo
+
+                    # read the secret path or pass the string
+                    ${if cfg.cidFile != null then ''
+                      CID_VALUE=$(cat "$CREDENTIALS_DIRECTORY/falcon_cid")
+                    '' else ''
+                      CID_VALUE="${cfg.cid}"
+                    ''}
+
                     ln -sf ${customFalconUnwrapped}/opt/CrowdStrike/* /opt/CrowdStrike/
                     /run/current-system/sw/bin/falconctl -s --trace=debug
-                    # Replace <cid> with your CID
-                    /run/current-system/sw/bin/falconctl -s --cid="${cidString}" -f
+                    /run/current-system/sw/bin/falconctl -s --cid="$CID_VALUE"
                     /run/current-system/sw/bin/falconctl -g --cid
                   '')
               ];
@@ -107,6 +119,8 @@ in {
               TimeoutStopSec = "60s";
               KillMode = "control-group";
               KillSignal = "SIGTERM";
+            } // lib.optionalAttrs (cfg.cidFile != null) {
+            LoadCredential = "falcon_cid:${cfg.cidFile}";
             };
             wantedBy = ["multi-user.target"];
           };
