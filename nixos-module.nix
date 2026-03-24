@@ -24,7 +24,7 @@ in {
         description = "falcon-sensor has a whitelist of supported kernels. This option sets the linux kernel.";
       };
       cid = mkOption {
-        type = types.str;
+        type = types.nullOr types.str;
         default = null;
         description = "Customer ID (CID) for your Crowdstrike Falcon Sensor.";
       };
