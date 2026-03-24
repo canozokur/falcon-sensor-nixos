@@ -25,10 +25,12 @@ in {
       };
       cid = mkOption {
         type = types.str;
+        default = null;
         description = "Customer ID (CID) for your Crowdstrike Falcon Sensor.";
       };
       cidFile = mkOption {
         type = types.either types.str types.path;
+        default = null;
         description = "Path to a file containing the CrowdStrike CID.";
       };
       debFile = mkOption {
