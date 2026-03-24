@@ -108,7 +108,7 @@ in {
 
                     ln -sf ${customFalconUnwrapped}/opt/CrowdStrike/* /opt/CrowdStrike/
                     /run/current-system/sw/bin/falconctl -s --trace=debug
-                    /run/current-system/sw/bin/falconctl -s --cid="$CID_VALUE"
+                    /run/current-system/sw/bin/falconctl -s -f --cid="$CID_VALUE"
                     /run/current-system/sw/bin/falconctl -g --cid
                   '')
               ];
