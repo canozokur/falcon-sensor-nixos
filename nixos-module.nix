@@ -29,7 +29,7 @@ in {
         description = "Customer ID (CID) for your Crowdstrike Falcon Sensor.";
       };
       cidFile = mkOption {
-        type = types.nullOr types.either types.str types.path;
+        type = types.nullOr (types.either types.path types.str);
         default = null;
         description = "Path to a file containing the CrowdStrike CID.";
       };
