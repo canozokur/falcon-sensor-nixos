@@ -24,7 +24,7 @@ in {
         description = "falcon-sensor has a whitelist of supported kernels. This option sets the linux kernel.";
       };
       cid = mkOption {
-        type = types.str;
+        type = types.either types.str types.path;
         description = "Customer ID (CID) for your Crowdstrike Falcon Sensor.";
       };
       debFile = mkOption {
@@ -64,7 +64,8 @@ in {
               };
             };
           };
-          services.falcon-sensor = {
+          services.falcon-sensor = 
+          {
             enable = true;
             description = "Crowdstrike Falcon Sensor";
             unitConfig.DefaultDependencies = false;
@@ -73,7 +74,17 @@ in {
             before = ["sysinit.target" "shutdown.target"];
             serviceConfig = {
               StandardOutput = "journal";
-              ExecStartPre = [
+              ExecStartPre =
+              let
+                # allow passing paths so we can pass secrets
+                cidString = if builtins.isPath cfg.cid then
+                  "$(cat ${cfg.cid})"
+                else if builtins.isString cfg.cid then
+                  cfg.cid
+                else
+                  "";
+              in
+              [
                 (pkgs.writeScript "falcon-init"
                   /*
                   bash
@@ -84,7 +95,7 @@ in {
                     ln -sf ${customFalconUnwrapped}/opt/CrowdStrike/* /opt/CrowdStrike/
                     /run/current-system/sw/bin/falconctl -s --trace=debug
                     # Replace <cid> with your CID
-                    /run/current-system/sw/bin/falconctl -s --cid="${cfg.cid}" -f
+                    /run/current-system/sw/bin/falconctl -s --cid="${cidString}" -f
                     /run/current-system/sw/bin/falconctl -g --cid
                   '')
               ];
