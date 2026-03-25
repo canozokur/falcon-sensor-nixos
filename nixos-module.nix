@@ -43,6 +43,11 @@ in {
         default = null;
         description = "Crowdstrike version";
       };
+      logLevel = mkOption {
+        type = types.enum [ "none" "err" "warn" "info" "debug" ];
+        default = "warn";
+        description = "falcon-sensor logging level";
+      };
     };
   };
 
@@ -108,7 +113,7 @@ in {
                     ''}
 
                     ln -sf ${customFalconUnwrapped}/opt/CrowdStrike/* /opt/CrowdStrike/
-                    /run/current-system/sw/bin/falconctl -s --trace=debug
+                    /run/current-system/sw/bin/falconctl -s --trace=${cfg.logLevel}
                     /run/current-system/sw/bin/falconctl -s -f --cid="$CID_VALUE"
                     /run/current-system/sw/bin/falconctl -g --cid
                   '')
