@@ -16,16 +16,7 @@ stdenv.mkDerivation {
   src = debFile;
   inherit version;
 
-  nativeBuildInputs = [
-    autoPatchelfHook
-    dpkg
-    zlib
-  ];
-
-  propagatedBuildInputs = [
-    openssl
-    libnl
-  ];
+  nativeBuildInputs = [ dpkg ];
 
   sourceRoot = ".";
 
