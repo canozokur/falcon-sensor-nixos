@@ -19,10 +19,10 @@ stdenv.mkDerivation {
   nativeBuildInputs = [
     autoPatchelfHook
     dpkg
-    zlib
   ];
 
-  propagatedBuildInputs = [
+  buildInputs = [
+    zlib
     openssl
     libnl
   ];
