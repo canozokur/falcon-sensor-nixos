@@ -2,10 +2,6 @@
   stdenv,
   lib,
   dpkg,
-  autoPatchelfHook,
-  zlib,
-  openssl,
-  libnl,
   debFile ? throw "You must provide the CrowdStrike .deb file path",
   version ? "unknown",
   ...
