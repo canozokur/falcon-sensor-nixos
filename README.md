@@ -2,9 +2,7 @@
 
 This was originally forked from a gist by @mrcjkb at https://gist.github.com/mrcjkb/6057932e51af8aade20896e2ad10b6f9 and modified by @benley
 
-For now, to use this you'll probably need to edit `falcon-sensor-unwrapped.nix` to point at your particular version of the falcon-sensor .deb file.
-
-Then add the flake to your system's `flake.nix`:
+Add the flake to your system's `flake.nix`:
 
 ```nix
 {
