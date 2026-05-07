@@ -119,12 +119,12 @@ in {
                       ln -sfT "$item" "$target" 2>/dev/null || true
                     done
 
-                    /run/current-system/sw/bin/falconctl -s --trace=${cfg.logLevel}
-                    /run/current-system/sw/bin/falconctl -s -f --cid="$CID_VALUE"
-                    /run/current-system/sw/bin/falconctl -g --cid
+                    ${customFalcon}/bin/falconctl -s --trace=${cfg.logLevel}
+                    ${customFalcon}/bin/falconctl -s -f --cid="$CID_VALUE"
+                    ${customFalcon}/bin/falconctl -g --cid
                   '')
               ];
-              ExecStart = "/run/current-system/sw/bin/falcond";
+              ExecStart = "${customFalcon}/bin/falcond";
               User = "root";
               Type = "forking";
               PIDFile = "/var/run/falcond.pid";
